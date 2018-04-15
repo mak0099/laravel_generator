@@ -1,0 +1,10 @@
+.form-group.required .control-label:after {
+    content:"*";
+    color: #cc3300;
+}
+.login-box-body, .register-box-body {
+    background: rgba(200,200,200,0.7);
+    padding: 20px;
+    border-top: 0;
+    color: #666;
+}
