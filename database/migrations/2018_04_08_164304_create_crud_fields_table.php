@@ -26,7 +26,7 @@ class CreateCrudFieldsTable extends Migration
             $table->boolean('primary')->default(false);
             $table->boolean('in_form')->default(true);
             $table->boolean('in_index')->default(true);
-            $table->boolean('in_view')->default(true);
+            $table->boolean('in_show')->default(true);
             $table->timestamps();
 
             $table->foreign('crud_id')->references('id')->on('cruds')->onDelete('cascade');

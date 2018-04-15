@@ -18,6 +18,11 @@
                     <i class="fa fa-circle-o"></i> <span>CRUD Generator</span>
                 </a>
             </li>
+            <li class="{!! Request::is('moderator/*') ? 'active' : '' !!}">
+                <a href="{{route('Moderator.index')}}">
+                    <i class="fa fa-circle-o"></i> <span>Moderator</span>
+                </a>
+            </li>
 
         </ul>
     </section>

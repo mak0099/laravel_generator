@@ -57,9 +57,14 @@
 		@endisset
 	</tbody>
 </table>
-<a href="" class="btn btn-success" data-toggle="modal" data-target="#modal-default">add new</a>
+<div class="text-center">
+	<a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modal-default">+ New</a>
+</div>
+<div class="pull-left">
+	<a href="{{route('add_crud')}}" class="btn btn-default"><i class="fa fa-chevron-left"></i> Previous</a>
+</div>
 <div class="pull-right">
-	<a href="{{route('save_field')}}" class="btn btn-success">Next</a>
+	<a href="{{route('save_field')}}" class="btn btn-default">Next <i class="fa fa-chevron-right"></i></a>
 </div>
 
 <div class="modal fade" id="modal-default">
@@ -131,7 +136,7 @@
 			        	<label><input type="checkbox" name="in_form" checked> In Form</label>
 			        </div>
 			        <div class="checkbox">
-			        	<label><input type="checkbox" name="in_view" checked> In View</label>
+			        	<label><input type="checkbox" name="in_show" checked> In Show</label>
 			        </div>
 			    </div>
 			</div> 

@@ -2,4 +2,4 @@
 <div class="form-group col-sm-6">
     {!! Form::label('$FIELD_NAME$', '$FIELD_NAME_TITLE$:') !!}
     {!! Form::email('$FIELD_NAME$', null, ['class' => 'form-control']) !!}
-</div>
+</div>		

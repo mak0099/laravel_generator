@@ -83,7 +83,7 @@ class CrudController extends Controller
             $field->primary = isset($s_field['primary']) ? true : false;
             $field->in_form = isset($s_field['in_form']) ? true : false;
             $field->in_index = isset($s_field['in_index']) ? true : false;
-            $field->in_view = isset($s_field['in_view']) ? true : false;
+            $field->in_show = isset($s_field['in_show']) ? true : false;
             $field->save();
         }
         return redirect()->route('crud_option', ['crud_id' => $crud->id]);
@@ -108,6 +108,9 @@ class CrudController extends Controller
         }
         if(isset($request->view)){
             $crud->generateCreate();
+            $crud->generateIndex();
+            $crud->generateEdit();
+            $crud->generateShow();
         }
     }
     

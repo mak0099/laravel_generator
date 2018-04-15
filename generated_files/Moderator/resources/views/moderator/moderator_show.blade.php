@@ -1,5 +1,5 @@
 @extends('layout')
-@section('title','$VIEW_NAME$')
+@section('title','Moderator')
 @section('style')
 
 @endsection
@@ -10,14 +10,18 @@
         <div class="panel panel-default card-view">
             <div class="panel-heading">
                 <div class="pull-left">
-                    <h6 class="panel-title txt-dark">$VIEW_NAME$</h6>
+                    <h6 class="panel-title txt-dark">Moderator</h6>
                 </div>
                 <div class="clearfix"></div>
             </div>
             <div class="panel-wrapper collapse in">
                 <div class="panel-body">
                     <table class="table">
-                        $SHOW_TABLE_CELLS$
+                        <tr><th>Username</th></tr>
+						<tr><td>{{$item->username}}</td></tr>
+						<tr><th>Email</th></tr>
+						<tr><td>{{$item->email}}</td></tr>
+						
                     </table>
                 </div>
             </div>

@@ -28,7 +28,6 @@ class Crud extends Model {
         $file_content = $this->get_file_content($stub_location, $replace);
         return $this->createFile($file_name, $file_directory, $file_content);
     }
-
     public function generateController() {
         $stub_location = 'resources/views/stub/controller.stub';
         $file_name = $this->controller_name . '.php';
@@ -44,7 +43,6 @@ class Crud extends Model {
         $file_content = $this->get_file_content($stub_location, $replace);
         return $this->createFile($file_name, $file_directory, $file_content);
     }
-
     public function generateMigration() {
         $stub_location = 'resources/views/stub/migration.stub';
         $file_name = date('Y_m_d_His') . '_create_' . $this->table_name . '_table.php';
@@ -58,19 +56,57 @@ class Crud extends Model {
         $file_content = $this->get_file_content($stub_location, $replace);
         return $this->createFile($file_name, $file_directory, $file_content);
     }
-
     public function generateCreate() {
         $stub_location = 'resources/views/stub/create.stub';
         $file_name = $this->view_directory . '_create.blade.php';
         $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
         $replace = [
-            '$view_name$' => $this->view_name,
-            '$route_name$' => $this->route_name,
+            '$view_name$' => $this->crud_view_name,
+            '$ROUTE_NAME$' => $this->route_name,
             '$form_fields$' => $this->form_fields(),
         ];
         $file_content = $this->get_file_content($stub_location, $replace);
         return $this->createFile($file_name, $file_directory, $file_content);
     }
+    public function generateIndex() {
+        $stub_location = 'resources/views/stub/index.stub';
+        $file_name = $this->view_directory . '_index.blade.php';
+        $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
+        $replace = [
+            '$VIEW_NAME$' => $this->crud_view_name,
+            '$ROUTE_NAME$' => $this->route_name,
+            '$TABLE_HEADERS$' => $this->table_headers(),
+            '$TABLE_CELLS$' => $this->table_cells(),
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
+    }
+    public function generateEdit() {
+        $stub_location = 'resources/views/stub/edit.stub';
+        $file_name = $this->view_directory . '_edit.blade.php';
+        $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
+        $replace = [
+            '$VIEW_NAME$' => $this->crud_view_name,
+            '$ROUTE_NAME$' => $this->route_name,
+            '$form_fields$' => $this->form_fields(),
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
+    }
+    public function generateShow() {
+        $stub_location = 'resources/views/stub/show.stub';
+        $file_name = $this->view_directory . '_show.blade.php';
+        $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
+        $replace = [
+            '$VIEW_NAME$' => $this->crud_view_name,
+            '$ROUTE_NAME$' => $this->route_name,
+            '$SHOW_TABLE_CELLS$' => $this->show_table_cells(),
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
+    }
+
+
 
     public function fillable_fields() {
         $fillable_fields = "";
@@ -119,34 +155,46 @@ class Crud extends Model {
         $fields = CrudField::where('crud_id', $this->id)->get();
         foreach ($fields as $field) {
             if($field['fillable']){
-                $form_fields .= $this->get_form_field($field);
+                $stub_location = 'resources/views/stub/form_fields/'. $field->html_type.'.stub';
+                $replace = [
+                    '$FIELD_NAME_TITLE$' => $field->field_view_name,
+                    '$FIELD_NAME$' => $field->field_name,
+                ];
+                $form_fields .= $this->get_file_content($stub_location, $replace) . "\r\n";
             }
         }
         return $form_fields;
     }
-    public function get_form_field($field){
-        $form_field = '';
-        switch ($field->html_type) {
-            case 'text':
-                $form_field = "<div class=\"form-group\">
-                                <label class=\"control-label mb-10\">{$field->field_view_name}</label>
-                                <input type=\"text\" class=\"form-control\" name=\"{$field->field_name}\" value=\"{{old('{$field->field_name}')}}\">
-                            </div>";
-                break;
-            case 'email':
-                $stub_location = 'resources/views/stub/form_fields/email.stub';
-                $replace = [
-                    '$view_name$' => $this->view_name,
-                    '$route_name$' => $this->route_name,
-                ];
-                $form_field = $this->get_file_content($stub_location, $replace);
-                break;
-            
-            default:
-                # code...
-                break;
+    public function table_headers(){
+        $table_headers = "";
+        $fields = CrudField::where('crud_id', $this->id)->get();
+        foreach ($fields as $field) {
+            if($field->in_index){
+                $table_headers .= "<th>" . $field->field_view_name . "</th>\r\n\t\t\t\t\t\t\t\t\t\t";
+            }
         }
-        return $form_field;
+        return $table_headers;
+    }
+    public function table_cells(){
+        $table_cells = "";
+        $fields = CrudField::where('crud_id', $this->id)->get();
+        foreach ($fields as $field) {
+            if($field->in_index){
+                $table_cells .= "<td>{{\$item->" . $field->field_name . "}}</td>\r\n\t\t\t\t\t\t\t\t\t\t";
+            }
+        }
+        return $table_cells;
+    }
+    public function show_table_cells(){
+        $show_table_cells = "";
+        $fields = CrudField::where('crud_id', $this->id)->get();
+        foreach ($fields as $field) {
+            if($field->in_show){
+                $show_table_cells .= "<tr><th>" . $field->field_view_name ."</th></tr>\r\n\t\t\t\t\t\t";
+                $show_table_cells .= "<tr><td>{{\$item->" . $field->field_name ."}}</td></tr>\r\n\t\t\t\t\t\t";
+            }
+        }
+        return $show_table_cells;
     }
 
 }

@@ -10,3 +10,5 @@ Route::get('/crud-generator/delete-field-item/{index}', ['as' => 'delete_field_i
 Route::get('/crud-generator/save-field', ['as' => 'save_field', 'uses' => 'CrudController@saveField']);
 Route::get('/crud-generator/crud-option/{crud_id}', ['as' => 'crud_option', 'uses' => 'CrudController@crudOption']);
 Route::post('/crud-generator/crud-generate/{crud_id}', ['as' => 'generate_crud', 'uses' => 'CrudController@generateCrud']);
+
+Route::resource('Moderator','ModeratorController');
