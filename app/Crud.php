@@ -6,155 +6,147 @@ use Illuminate\Database\Eloquent\Model;
 use App\CrudField;
 use App\Inflector;
 
-class Crud extends Model
-{
-	private $project_root;
-	private $model_name;
-	private $i;
-	public function __construct(){
-	}
-    public function generateModel(){
-		$this->project_root = "generated_files/". $this->crud_name;
-		$this->model_name = Inflector::text($this->crud_name)->camel_case(true)->get();
-    	$file_content = fopen('resources/views/stub/model.stub', 'r') or die("Unable to open file!");
-        dd(fread($file_content, filesize('resources/views/stub/model.stub')));
-		return $this->createFile($this->model_name, "{$this->project_root}/app", $file_content);
+class Crud extends Model {
+
+    public static function generation($crud_id){
+        $crud = Crud::findOrFail($crud_id);
+        $crud->project_root = "generated_files/" . $crud->crud_name;
+        $crud->model_name = Inflector::text($crud->crud_name)->camel_case(true)->get();
+        $crud->controller_name = Inflector::text($crud->crud_name)->camel_case(true)->get() . 'Controller';
+        $crud->view_directory = Inflector::text($crud->crud_name)->snake_case()->get();
+        $crud->route_name = Inflector::text($crud->crud_name)->camel_case(true)->get();
+        return $crud;
     }
-    public function generateController(){
-		$this->project_root = "generated_files/". $this->crud_name;
-		$this->model_name = Inflector::text($this->crud_name)->camel_case(true)->get();
-		$this->controller_name = Inflector::text($this->crud_name)->camel_case(true)->get() . 'Controller';
-		$this->view_directory = Inflector::text($this->crud_name)->snake_case()->get();
-		$this->route_name = Inflector::text($this->crud_name)->camel_case(true)->get();
-    	$file_content =  
-"<?php
-
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use App\\{$this->model_name};
-use Auth;
-use Session;
-
-class {$this->controller_name} extends Controller {
-
-    private \$root = '{$this->view_directory}';
-
-    public function index() {
-        \$view = view(\$this->root . '/{$this->view_directory}_index');
-        \$view->with('items', {$this->model_name}::all());
-        return \$view;
+    public function generateModel() {
+        $stub_location = 'resources/views/stub/model.stub';
+        $file_name = $this->model_name . '.php';
+        $file_directory = $this->project_root. '/app';
+        $replace = [
+            '$model_name$' => $this->model_name,
+            '$fillable_fields$' => $this->fillable_fields(),
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
     }
 
-    public function create() {
-        \$view = view(\$this->root . '/{$this->view_directory}_create');
-        return \$view;
+    public function generateController() {
+        $stub_location = 'resources/views/stub/controller.stub';
+        $file_name = $this->controller_name . '.php';
+        $file_directory = $this->project_root. '/app/Http/Controllers';
+        $replace = [
+            '$model_name$' => $this->model_name,
+            '$controller_name$' => $this->controller_name,
+            '$view_directory$' => $this->view_directory,
+            '$route_name$' => $this->route_name,
+            '$storing_validations$' => $this->storing_validations(),
+            '$updating_validations$' => $this->updating_validations(),
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
     }
 
-    public function store(Request \$request) {
-        {$this->storing_validations()}
-        \$item = new {$this->model_name}();
-        \$item->fill(\$request->input());
-        \$item->created_by = Auth::id();
-        \$item->save();
-        Session::flash('alert-success', 'New item created.');
-        return redirect()->route('{$this->route_name}.index');
+    public function generateMigration() {
+        $stub_location = 'resources/views/stub/migration.stub';
+        $file_name = date('Y_m_d_His') . '_create_' . $this->table_name . '_table.php';
+        $file_directory = $this->project_root. '/database/migrations';
+        $replace = [
+            '$model_name$' => $this->model_name,
+            '$model_name_plural$' => Inflector::text($this->model_name)->pluralize()->get(),
+            '$table_name$' => $this->table_name,
+            '$migration_fields$' => $this->migration_fields(),
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
     }
 
-    public function show(\$id) {
-        \$view = view(\$this->root . '/{$this->view_directory}_show');
-        \$view->with('item', {$this->model_name}::findOrFail(\$id));
-        return \$view;
+    public function generateCreate() {
+        $stub_location = 'resources/views/stub/create.stub';
+        $file_name = $this->view_directory . '_create.blade.php';
+        $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
+        $replace = [
+            '$view_name$' => $this->view_name,
+            '$route_name$' => $this->route_name,
+            '$form_fields$' => $this->form_fields(),
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
     }
 
-    public function edit(\$id) {
-        \$view = view(\$this->root . '/{$this->view_directory}_edit');
-        \$view->with('item', {$this->model_name}::findOrFail(\$id));
-        return \$view;
+    public function fillable_fields() {
+        $fillable_fields = "";
+        $fields = CrudField::where('crud_id', $this->id)->get();
+        foreach ($fields as $field) {
+            $fillable_fields .= "'" . $field->field_name . "',\n\t\t";
+        }
+        return $fillable_fields;
     }
 
-    public function update(Request \$request, \$id) {
-        {$this->updating_validations()}
-        \$item = {$this->model_name}::findOrFail(\$id);
-        \$item->fill(\$request->input());
-        \$item->created_by = Auth::id();
-        \$item->update();
-        Session::flash('alert-success', 'Item updated');
-        return redirect()->route('{$this->route_name}.index');
+    public function get_file_content($stub_location, $replace){
+        $file = fopen($stub_location, 'r') or die("Unable to open file!");
+        $read_content = fread($file, filesize($stub_location));
+        $file_content = str_replace(array_keys($replace),array_values($replace), $read_content);
+        return $file_content;
+    }
+    public function createFile($file_name, $directory, $file_content) {
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+        $myfile = fopen("{$directory}/{$file_name}", "w") or die("Unable to make model!");
+        fwrite($myfile, $file_content);
+        fclose($myfile);
+        return true;
     }
 
-    public function destroy(\$id) {
-        {$this->model_name}::findOrFail(\$id)->delete();
-        Session::flash('alert-success', 'item deleted');
-        return redirect()->back();
+    public function storing_validations() {
+        return '';
     }
 
-}
-";
-		return $this->createFile($this->controller_name, "{$this->project_root}/app/Http/Controllers", $file_content);
+    public function updating_validations() {
+        return '';
     }
-    public function generateMigration(){
-		$this->project_root = "generated_files/". $this->crud_name;
-		$this->model_name = Inflector::text($this->crud_name)->camel_case(true)->get();
-		$this->controller_name = Inflector::text($this->crud_name)->camel_case(true)->get() . 'Controller';
-		$this->view_directory = Inflector::text($this->crud_name)->snake_case()->get();
-		$this->route_name = Inflector::text($this->crud_name)->camel_case(true)->get();
-		$this->model_name_plural = Inflector::text($this->model_name)->pluralize()->get();
-    	$file_content =  
-"<?php
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Migrations\Migration;
 
-class Create{$this->model_name_plural}Table extends Migration
-{
-    public function up()
-    {
-        Schema::create('{$this->table_name}', function (Blueprint \$table) {
-            \$table->increments('id');{$this->table_fields()}
-            \$table->softDeletes();
-            \$table->timestamps();
-        });
+    public function migration_fields() {
+        $migration_fields = "";
+        $fields = CrudField::where('crud_id', $this->id)->get();
+        foreach ($fields as $field) {
+            $migration_fields .= "\n\t\t\t\$table->" . $field->db_type . "('" . $field->field_name . "')";
+            $migration_fields .= ";";
+        }
+        return $migration_fields;
     }
-    public function down()
-    {
-        Schema::dropIfExists('{$this->table_name}');
+    public function form_fields() {
+        $form_fields = "";
+        $fields = CrudField::where('crud_id', $this->id)->get();
+        foreach ($fields as $field) {
+            if($field['fillable']){
+                $form_fields .= $this->get_form_field($field);
+            }
+        }
+        return $form_fields;
     }
-}
+    public function get_form_field($field){
+        $form_field = '';
+        switch ($field->html_type) {
+            case 'text':
+                $form_field = "<div class=\"form-group\">
+                                <label class=\"control-label mb-10\">{$field->field_view_name}</label>
+                                <input type=\"text\" class=\"form-control\" name=\"{$field->field_name}\" value=\"{{old('{$field->field_name}')}}\">
+                            </div>";
+                break;
+            case 'email':
+                $stub_location = 'resources/views/stub/form_fields/email.stub';
+                $replace = [
+                    '$view_name$' => $this->view_name,
+                    '$route_name$' => $this->route_name,
+                ];
+                $form_field = $this->get_file_content($stub_location, $replace);
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+        return $form_field;
+    }
 
-";
-		return $this->createFile(date('Y_m_d_His') . '_create_' . $this->table_name . '_table', "{$this->project_root}/database/migrations", $file_content);
-    }
-    public function fillable_fields(){
-    	$fillable_fields = "";
-    	$fields = CrudField::where('crud_id', $this->id)->get();
-		foreach($fields as $field){
-		    $fillable_fields .= "'" . $field->field_name . "',\n\t\t";
-		}
-		return $fillable_fields;
-    }
-    public function createFile($file_name, $directory, $file_content){
-    	if (!file_exists($directory)) {
-		    mkdir($directory, 0777, true);
-		}
-		$myfile = fopen("{$directory}/{$file_name}.php", "w") or die("Unable to make model!");
-		fwrite($myfile, $file_content);
-		fclose($myfile);
-		return true;
-    }
-    public function storing_validations(){
-    	return '';
-    }
-    public function updating_validations(){
-    	return '';
-    }
-    public function table_fields(){
-    	$table_fields = "";
-    	$fields = CrudField::where('crud_id', $this->id)->get();
-    	foreach($fields as $field){
-		    $table_fields .= "\n\t\t\t\$table->" . $field->db_type . "('" . $field->field_name . "')";
-		    $table_fields .= ";";
-		}
-		return $table_fields;
-    }
 }

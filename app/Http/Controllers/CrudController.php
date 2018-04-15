@@ -96,15 +96,18 @@ class CrudController extends Controller
         return $view;
     }
     public function generateCrud($crud_id, Request $request){
-        $crud = Crud::findOrFail($crud_id);
+        $crud = Crud::generation($crud_id);
         if(isset($request->model)){
             $crud->generateModel();
         }
         if(isset($request->Controller)){
             $crud->generateController();
         }
-        if(isset($request->Controller)){
+        if(isset($request->migration)){
             $crud->generateMigration();
+        }
+        if(isset($request->view)){
+            $crud->generateCreate();
         }
     }
     
