@@ -13,12 +13,12 @@ class Crud extends Model {
         $crud->project_root = "generated_files/" . $crud->crud_name;
         $crud->model_name = Inflector::text($crud->crud_name)->camel_case(true)->get();
         $crud->controller_name = Inflector::text($crud->crud_name)->camel_case(true)->get() . 'Controller';
-        $crud->view_directory = Inflector::text($crud->crud_name)->snake_case()->get();
+        $crud->view_directory = $crud->project_root . "/resources/views/" . Inflector::text($crud->crud_name)->snake_case()->get();
         $crud->route_name = Inflector::text($crud->crud_name)->camel_case(true)->get();
         return $crud;
     }
     public function generateModel() {
-        $stub_location = 'resources/views/stub/model.stub';
+        $stub_location = 'stub/model.stub';
         $file_name = $this->model_name . '.php';
         $file_directory = $this->project_root. '/app';
         $replace = [
@@ -29,7 +29,7 @@ class Crud extends Model {
         return $this->createFile($file_name, $file_directory, $file_content);
     }
     public function generateController() {
-        $stub_location = 'resources/views/stub/controller.stub';
+        $stub_location = 'stub/controller.stub';
         $file_name = $this->controller_name . '.php';
         $file_directory = $this->project_root. '/app/Http/Controllers';
         $replace = [
@@ -44,7 +44,7 @@ class Crud extends Model {
         return $this->createFile($file_name, $file_directory, $file_content);
     }
     public function generateMigration() {
-        $stub_location = 'resources/views/stub/migration.stub';
+        $stub_location = 'stub/migration.stub';
         $file_name = date('Y_m_d_His') . '_create_' . $this->table_name . '_table.php';
         $file_directory = $this->project_root. '/database/migrations';
         $replace = [
@@ -57,9 +57,9 @@ class Crud extends Model {
         return $this->createFile($file_name, $file_directory, $file_content);
     }
     public function generateCreate() {
-        $stub_location = 'resources/views/stub/create.stub';
+        $stub_location = 'stub/create.stub';
         $file_name = $this->view_directory . '_create.blade.php';
-        $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
+        $file_directory = $this->project_root. '/' . $this->view_directory;
         $replace = [
             '$view_name$' => $this->crud_view_name,
             '$ROUTE_NAME$' => $this->route_name,
@@ -69,9 +69,9 @@ class Crud extends Model {
         return $this->createFile($file_name, $file_directory, $file_content);
     }
     public function generateIndex() {
-        $stub_location = 'resources/views/stub/index.stub';
+        $stub_location = 'stub/index.stub';
         $file_name = $this->view_directory . '_index.blade.php';
-        $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
+        $file_directory = $this->project_root. '/' . $this->view_directory;
         $replace = [
             '$VIEW_NAME$' => $this->crud_view_name,
             '$ROUTE_NAME$' => $this->route_name,
@@ -82,9 +82,9 @@ class Crud extends Model {
         return $this->createFile($file_name, $file_directory, $file_content);
     }
     public function generateEdit() {
-        $stub_location = 'resources/views/stub/edit.stub';
+        $stub_location = 'stub/edit.stub';
         $file_name = $this->view_directory . '_edit.blade.php';
-        $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
+        $file_directory = $this->project_root. '/' . $this->view_directory;
         $replace = [
             '$VIEW_NAME$' => $this->crud_view_name,
             '$ROUTE_NAME$' => $this->route_name,
@@ -94,9 +94,9 @@ class Crud extends Model {
         return $this->createFile($file_name, $file_directory, $file_content);
     }
     public function generateShow() {
-        $stub_location = 'resources/views/stub/show.stub';
+        $stub_location = 'stub/show.stub';
         $file_name = $this->view_directory . '_show.blade.php';
-        $file_directory = $this->project_root. '/resources/views/' . $this->view_directory;
+        $file_directory = $this->project_root. '/' . $this->view_directory;
         $replace = [
             '$VIEW_NAME$' => $this->crud_view_name,
             '$ROUTE_NAME$' => $this->route_name,
@@ -155,7 +155,7 @@ class Crud extends Model {
         $fields = CrudField::where('crud_id', $this->id)->get();
         foreach ($fields as $field) {
             if($field['fillable']){
-                $stub_location = 'resources/views/stub/form_fields/'. $field->html_type.'.stub';
+                $stub_location = 'stub/form_fields/'. $field->html_type.'.stub';
                 $replace = [
                     '$FIELD_NAME_TITLE$' => $field->field_view_name,
                     '$FIELD_NAME$' => $field->field_name,

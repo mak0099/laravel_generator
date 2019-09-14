@@ -1,7 +1,7 @@
 @extends('layout')
 @section('title','Moderator')
 @section('style')
-<link href="{{asset('public/admin/vendors/bower_components/datatables/media/css/jquery.dataTables.min.css')}}" rel="stylesheet" type="text/css">
+<link href="{{asset('admin/vendors/bower_components/datatables/media/css/jquery.dataTables.min.css')}}" rel="stylesheet" type="text/css">
 @endsection
 @section('content')
 <!-- Row -->
@@ -69,7 +69,7 @@
 @endsection
 @section('script')
 <!-- Data table JavaScript -->
-<script src="{{asset('public/admin/vendors/bower_components/datatables/media/js/jquery.dataTables.min.js')}}"></script>
+<script src="{{asset('admin/vendors/bower_components/datatables/media/js/jquery.dataTables.min.js')}}"></script>
 <script>
 $(document).ready(function () {
     $('#datable_1').DataTable();

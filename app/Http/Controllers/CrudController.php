@@ -12,11 +12,11 @@ class CrudController extends Controller
 {
     public function index()
     {
-        return view('crud_generator.crud_index');
+        return view(config('dashboard.view_root') . 'crud_generator.crud_index');
     }
     public function addCrud()
     {
-        return view('crud_generator.add_crud');
+        return view(config('dashboard.view_root') . 'crud_generator.add_crud');
     }
     public function saveCrud(Request $request)
     {
@@ -26,7 +26,7 @@ class CrudController extends Controller
 
     public function addField()
     {
-        $view = view('crud_generator.add_field');
+        $view = view(config('dashboard.view_root') . 'crud_generator.add_field');
         $crud_info = Session::get('crud_info');
         if(!$crud_info['crud_name']){
             Session::flash('alert-danger','Crud name required');
@@ -90,7 +90,7 @@ class CrudController extends Controller
     }
     public function crudOption($crud_id)
     {
-        $view = view('crud_generator.crud_option');
+        $view = view(config('dashboard.view_root') . 'crud_generator.crud_option');
         $crud = Crud::findOrFail($crud_id);
         $view->with('crud', $crud);
         return $view;
@@ -112,6 +112,7 @@ class CrudController extends Controller
             $crud->generateEdit();
             $crud->generateShow();
         }
+        return redirect()->route('add_crud');
     }
     
 }

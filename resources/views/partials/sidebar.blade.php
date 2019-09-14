@@ -18,9 +18,9 @@
                     <i class="fa fa-circle-o"></i> <span>CRUD Generator</span>
                 </a>
             </li>
-            <li class="{!! Request::is('moderator/*') ? 'active' : '' !!}">
-                <a href="{{route('Moderator.index')}}">
-                    <i class="fa fa-circle-o"></i> <span>Moderator</span>
+            <li class="{!! Request::is('database-management*') ? 'active' : '' !!}">
+                <a href="{{route('database-management.index')}}">
+                    <i class="fa fa-circle-o"></i> <span>Database Management</span>
                 </a>
             </li>
 
