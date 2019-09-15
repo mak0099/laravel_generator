@@ -47,9 +47,9 @@
                                 <div class="dropdown">
                                     <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
                                     <ul class="dropdown-menu pull-right">
-                                        <li><a href="{{ route('database.show', $item) }}"><i class="fa fa-eye m-r-5"></i> View Detail</a></li>
                                         <li><a href="{{ route('database.show', $item) }}"><i class="fa fa-list m-r-5"></i> View Tables with Columns</a></li>
                                         <li><a href="{{ route('database.edit', $item) }}"><i class="fa fa-pencil m-r-5"></i> Edit</a></li>
+                                        <li><a href="{{ route('database.exportation', [$item]) }}"><i class="fa fa-download m-r-5"></i> Export</a></li>
                                         <li><a href="#" data-toggle="modal" data-target="#delete" ng-click="delete_url = '{{ route('database.destroy', $item) }}'"><i class="fa fa-trash-o m-r-5"></i> Delete</a></li>
                                     </ul>
                                 </div>

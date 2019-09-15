@@ -3,18 +3,16 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Create$model_name_plural$Table extends Migration
+class >>table_class_name<< extends Migration
 {
     public function up()
     {
-        Schema::create('$table_name$', function (Blueprint $table) {
-            $table->increments('id');$migration_fields$
-            $table->softDeletes();
-            $table->timestamps();
+        Schema::create('>>table_name<<', function (Blueprint $table) {
+>>migration_columns<<
         });
     }
     public function down()
     {
-        Schema::dropIfExists('$table_name$');
+        Schema::dropIfExists('>>table_name<<');
     }
 }

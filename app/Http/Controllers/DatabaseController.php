@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Database;
+use App\Models\FileMaker;
+use App\Models\Table;
 use Helmesvs\Notify\Facades\Notify;
 use Illuminate\Http\Request;
 use Auth;
 use Carbon\Carbon;
+use Chumper\Zipper\Zipper;
+use ZanySoft\Zip\Zip;
 
 class DatabaseController extends Controller
 {
@@ -17,7 +21,7 @@ class DatabaseController extends Controller
      */
     public function index()
     {
-        $view = view(config('dashboard.view_root'). 'database.index');
+        $view = view(config('dashboard.view_root') . 'database.index');
         $view->with('database_list', Database::orderBy('id', 'desc')->get());
         return $view;
     }
@@ -42,7 +46,7 @@ class DatabaseController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-          ]);
+        ]);
         $database = new Database();
         $database->fill($request->input());
         $database->creator_user_id = Auth::id();
@@ -59,7 +63,7 @@ class DatabaseController extends Controller
      */
     public function show(Database $database)
     {
-        $view = view(config('dashboard.view_root'). 'database.detail');
+        $view = view(config('dashboard.view_root') . 'database.detail');
         $view->with('database', $database);
         return $view;
     }
@@ -72,7 +76,7 @@ class DatabaseController extends Controller
      */
     public function edit(Database $database)
     {
-        $view = view(config('dashboard.view_root'). 'database.edit');
+        $view = view(config('dashboard.view_root') . 'database.edit');
         $view->with('database', $database);
         return $view;
     }
@@ -88,7 +92,7 @@ class DatabaseController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-         ]);
+        ]);
         $database->fill($request->input());
         $database->updator_user_id = Auth::id();
         $database->update();
@@ -104,7 +108,7 @@ class DatabaseController extends Controller
      */
     public function destroy(Database $database)
     {
-        if($database->tables->count() > 0){
+        if ($database->tables->count() > 0) {
             Notify::warning('First, delete all tables belong to the database!', 'Warning');
             return redirect()->back();
         }
@@ -113,22 +117,36 @@ class DatabaseController extends Controller
         Notify::success('Database deleted', 'Success');
         return redirect()->route('database.index');
     }
-    public function exportation(Database $database){
-        $view = view(config('dashboard.view_root'). 'database.exportation');
+    public function exportation(Database $database)
+    {
+        $view = view(config('dashboard.view_root') . 'database.exportation');
         $view->with('database', $database);
         return $view;
     }
-    public function export(Database $database, Request $request){
-        // dd($request->input());
-        if(!$request->tables){
+    public function export(Database $database, Request $request)
+    {
+        if (!$request->tables) {
             Notify::error('You have to select at least one table', 'Error');
             return redirect()->back();
         }
-        Notify::success('Database exported successfully', 'Success');
+        $destination_path = 'generated_files/migration_tables.zip';
+        if (file_exists($destination_path)) {
+            unlink($destination_path);
+        }
+        $tables = Table::find($request->tables);
+        foreach ($tables as $table) {
+            $table->add_to_export($destination_path);
+        }
+        if (file_exists($destination_path)) {
+            $zip_file_name = 'migrations';
+            return $database->getDownload($destination_path, $zip_file_name);
+        }
+        Notify::error('Download Error', 'Error');
         return redirect()->back();
     }
-    private function delete_file($file_path){
-        if(file_exists($file_path)){
+    private function delete_file($file_path)
+    {
+        if (file_exists($file_path)) {
             unlink($file_path);
         }
     }

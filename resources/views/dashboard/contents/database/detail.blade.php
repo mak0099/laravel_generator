@@ -23,7 +23,7 @@
 
 <div id="detail" class="modal custom-modal fade" role="dialog" ng-controller="myCtrl">
     <div class="modal-dialog">
-        <form action="{{ URL::previous() }}">
+        <form action="{{ route('database.index') }}">
             <button type="submit" class="close">&times;</button>
         </form>
         <div class="modal-content modal-lg">
@@ -35,8 +35,8 @@
                     <div class="btn-group">
                         <button type="button" data-toggle="dropdown" class="btn btn-success dropdown-toggle" aria-expanded="false">Export Database <span class="caret"></span></button>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ route('database.exportation', [$database]) }}">Laravel Migration</a></li>
-                            <li><a href="#">SQL File</a></li>
+                            <li><a href="{{ route('database.exportation', [$database]) }}">Laravel Migrations (.zip)</a></li>
+                            <li><a href="#">SQL File (.sql)</a></li>
                             <li class="divider"></li>
                             <li><a href="#">Under Construction</a></li>
                         </ul>

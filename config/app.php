@@ -153,6 +153,8 @@ return [
          */
         Watson\BootstrapForm\BootstrapFormServiceProvider::class,
         Helmesvs\Notify\NotifyServiceProvider::class,
+        Chumper\Zipper\ZipperServiceProvider::class,
+        ZanySoft\Zip\ZipServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -215,6 +217,8 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
         'BootForm' => Watson\BootstrapForm\Facades\BootstrapForm::class,
         'Notify' => Helmesvs\Notify\Facades\Notify::class,
+        'Zipper' => Chumper\Zipper\Zipper::class,
+        'Zip' => ZanySoft\Zip\ZipFacade::class,
 
     ],
 

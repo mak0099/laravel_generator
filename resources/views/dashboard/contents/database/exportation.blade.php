@@ -14,19 +14,10 @@
         </form>
         <div class="modal-content modal-lg">
             <div class="modal-header">
-                <h4 class="modal-title pull-left">Export Database</h4>
+                <h4 class="modal-title pull-left">Export Laravel Migrations (.zip)</h4>
                 <div class="pull-right">
-                    <a href="{{ route('database.edit', [$database]) }}" class="btn btn-primary"><i class="fa fa-edit"></i> Edit Database</a>
+                    <a href="{{ route('database.index') }}" class="btn btn-primary"><i class="fa fa-database"></i> Manage Database</a>
                     <a href="{{ route('database.table.index', [$database]) }}" class="btn btn-info"><i class="fa fa-table"></i> Manage Tables</a>
-                    <div class="btn-group">
-                        <button type="button" data-toggle="dropdown" class="btn btn-success dropdown-toggle" aria-expanded="false">Export Database <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li><a href="{{ route('database.exportation', [$database]) }}">Laravel Migration</a></li>
-                            <li><a href="#">SQL File</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Under Construction</a></li>
-                        </ul>
-                    </div>
                 </div>
             </div>
             <div class="modal-body">
@@ -35,7 +26,7 @@
                     <form action="{{ route('database.export', [$database]) }}" method="POST">
                         @csrf @method('POST')
                         <h4>Select Tables to export 
-                            <input type="checkbox" class="pull-right" data-toggle="toggle" data-style="android" data-onstyle="primary" data-size="mini" data-on="Check All" data-off="Uncheck All" onchange='openAll(this)'>
+                            <input type="checkbox" class="pull-right" data-toggle="toggle" data-onstyle="primary" data-size="mini" data-on="All" data-off="Check All" onchange='openAll(this)'>
                         </h4>
                         @foreach($database->tables->where('active', true) as $table)
                         <div class="checkbox">
@@ -43,7 +34,7 @@
                         </div>
                         @endforeach
                         <div class="m-t-20 text-center">
-                            <button class="btn btn-primary btn-lg">Export Database</button>
+                            <button class="btn btn-primary btn-lg">Export</button>
                         </div>
                     </form>
                 </div> 
