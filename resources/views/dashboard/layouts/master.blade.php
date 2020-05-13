@@ -66,6 +66,8 @@
             param.model = el.data('model');
             param.value_field = el.data('value-field');
             param.text_field = el.data('text-field');
+            param.where_column = el.data('where-column');
+            param.where_value = el.data('where-value');
             param.dependent_field = el.data('dependent-field');
             var el_d = $('#' + el.data('dependent-element-id'));
             param.dependent_model = el_d.data('model');

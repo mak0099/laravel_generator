@@ -34,7 +34,8 @@
                         </div>
                         @endforeach
                         <div class="m-t-20 text-center">
-                            <button class="btn btn-primary btn-lg">Export</button>
+                            <button type="submit" name="export_type" value="migration" class="btn btn-primary btn-lg">Export Migrations</button>
+                            <button type="submit" name="export_type" value="api-crud" class="btn btn-info btn-lg">Export API CRUD</button>
                         </div>
                     </form>
                 </div> 

@@ -146,14 +146,18 @@ class DashboardController extends Controller
         $model = '\App\Models\\' . $request->model;
         $dependent_model = $request->dependent_model;
         $dependent_value = $request->dependent_value;
+        $where_column = $request->where_column;
+        $where_value = $request->where_value;
         $value_field = $request->value_field ?? 'id';
         $text_field = $request->text_field ?? 'name';
+        $items = new $model;
         if($dependent_model){
             $dependent_field = $request->dependent_field ?? camel_to_snake($dependent_model) . '_id';
-            $items = $model::where($dependent_field, $dependent_value)->select($value_field, $text_field .' AS text')->get();
-        }else{
-            $items = $model::select($value_field, $text_field .' AS text')->get();
+            $items = $items->where($dependent_field, $dependent_value);
         }
-        return $items;
+        if($where_column && $where_value){
+            $items = $items->where($where_column, $where_value);
+        }
+        return $items->select($value_field, $text_field .' AS text')->get();
     }
 }

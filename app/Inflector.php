@@ -505,10 +505,12 @@ class Inflector extends Model
      * @return string Word in singular
      * @link https://book.cakephp.org/3.0/en/core-libraries/inflector.html#creating-plural-singular-forms
      */
-    public static function singularize($word)
+    public function singularize()
     {
+    	$word = $this->value;
         if (isset(static::$_cache['singularize'][$word])) {
-            return static::$_cache['singularize'][$word];
+            $this->value = static::$_cache['singularize'][$word];
+            return $this;
         }
         if (!isset(static::$_cache['irregular']['singular'])) {
             static::$_cache['irregular']['singular'] = '(?:' . implode('|', static::$_irregular) . ')';
@@ -516,23 +518,27 @@ class Inflector extends Model
         if (preg_match('/(.*?(?:\\b|_))(' . static::$_cache['irregular']['singular'] . ')$/i', $word, $regs)) {
             static::$_cache['singularize'][$word] = $regs[1] . substr($regs[2], 0, 1) .
                 substr(array_search(strtolower($regs[2]), static::$_irregular), 1);
-            return static::$_cache['singularize'][$word];
+                $this->value = static::$_cache['singularize'][$word];
+                return $this;
         }
         if (!isset(static::$_cache['uninflected'])) {
             static::$_cache['uninflected'] = '(?:' . implode('|', static::$_uninflected) . ')';
         }
         if (preg_match('/^(' . static::$_cache['uninflected'] . ')$/i', $word, $regs)) {
             static::$_cache['pluralize'][$word] = $word;
-            return $word;
+            $this->value = $word;
+            return $this;
         }
         foreach (static::$_singular as $rule => $replacement) {
             if (preg_match($rule, $word)) {
                 static::$_cache['singularize'][$word] = preg_replace($rule, $replacement, $word);
-                return static::$_cache['singularize'][$word];
+                $this->value = static::$_cache['singularize'][$word];
+                return $this;
             }
         }
         static::$_cache['singularize'][$word] = $word;
-        return $word;
+        $this->value = $word;
+        return $this;
     }
     /**
      * Returns the input lower_case_delimited_string as a CamelCasedString.

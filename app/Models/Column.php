@@ -38,9 +38,9 @@ class Column extends Model implements Sortable
     {
         return $this->belongsTo(Database::class);
     }
-    public function table()
+    public function tbl()
     {
-        return $this->belongsTo(Table::class);
+        return $this->belongsTo(Table::class, 'table_id');
     }
     public function foreign_table()
     {

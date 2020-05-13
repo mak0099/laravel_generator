@@ -29,6 +29,8 @@ Route::group(['prefix' => 'dashboard'], function () {
         
         Route::get('/database/{database}/exportation', ['as' => 'database.exportation', 'uses' => 'DatabaseController@exportation']);
         Route::post('/database/{database}/export', ['as' => 'database.export', 'uses' => 'DatabaseController@export']);
+        Route::get('/database/{database}/table/{table}/api-crud', ['as' => 'database.table.api_crud', 'uses' => 'TableController@api_crud']);
+        Route::post('/database/{database}/table/{table}/export-api-crud', ['as' => 'database.table.export_api_crud', 'uses' => 'TableController@export_api_crud']);
         Route::resource('database', 'DatabaseController');
         Route::resource('database.table', 'TableController');
         Route::resource('database.table.column', 'ColumnController');

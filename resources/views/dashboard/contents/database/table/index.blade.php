@@ -61,6 +61,7 @@
                                 <div class="dropdown">
                                     <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
                                     <ul class="dropdown-menu pull-right">
+                                        <li><a href="{{ route('database.table.api_crud', [$database, $item]) }}"><i class="fa fa-eye m-r-5"></i> Make API CRUD</a></li>
                                         <li><a href="#" data-toggle="modal" data-target="#delete" ng-click="delete_url = '{{ route('database.table.destroy', [$database, $item]) }}'"><i class="fa fa-trash-o m-r-5"></i> Delete</a></li>
                                     </ul>
                                 </div>
@@ -98,7 +99,7 @@
                             <div class="well">
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        {!! BootForm::select('foreign_table_id', 'Select User Table', [], old('foreign_table_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Table','data-model'=>'Table', 'data-text-field'=>'name']) !!}
+                                        {!! BootForm::select('foreign_table_id', 'Select User Table', [], old('foreign_table_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Table','data-model'=>'Table', 'data-text-field'=>'name', 'data-where-column'=>'database_id', 'data-where-value'=>$database->id]) !!}
                                     </div>
                                     <div class="col-sm-4">
                                         {!! BootForm::select('foreign_column_id', 'Select ID Field', [], old('foreign_column_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Column','data-model'=>'Column', 'data-text-field'=>'name', 'data-dependent-element-id'=>'foreign_table_id']) !!}

@@ -43,6 +43,30 @@ class Crud extends Model {
         $file_content = $this->get_file_content($stub_location, $replace);
         return $this->createFile($file_name, $file_directory, $file_content);
     }
+    public function generateApiController() {
+        $stub_location = 'stub/api/controller.stub';
+        $file_name = $this->controller_name . '.php';
+        $file_directory = $this->project_root. '/app/Http/Controllers';
+        $replace = [
+            '$MODEL_NAME$' => $this->model_name,
+            '$ROUTE_NAME$' => $this->route_name,
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
+    }
+    public function generateApiResource() {
+        $stub_location = 'stub/api/resource.stub';
+        $file_name = $this->model_name . 'Resource.php';
+        $file_directory = $this->project_root. '/app/Http/Resources';
+        $replace = [
+            '$MODEL_NAME$' => $this->model_name,
+            '$ROUTE_NAME$' => $this->route_name,
+            '$ROUTE_NAME_PLURAL$' => Inflector::text($this->route_name)->pluralize()->get(),
+            '$RESOURCE_FIELDS$' => $this->resource_fileds(),
+        ];
+        $file_content = $this->get_file_content($stub_location, $replace);
+        return $this->createFile($file_name, $file_directory, $file_content);
+    }
     public function generateMigration() {
         $stub_location = 'stub/migration.stub';
         $file_name = date('Y_m_d_His') . '_create_' . $this->table_name . '_table.php';
@@ -164,6 +188,15 @@ class Crud extends Model {
             }
         }
         return $form_fields;
+    }
+    public function resource_fileds(){
+        $resource_fields = "";
+        $fields = CrudField::where('crud_id', $this->id)->get();
+        foreach ($fields as $field) {
+            $resource_fields .= "\n\t\t\t'" . $field->field_name . "'=>\$this->" . $field->field_name;
+            $resource_fields .= ",";
+        }
+        return $resource_fields;
     }
     public function table_headers(){
         $table_headers = "";

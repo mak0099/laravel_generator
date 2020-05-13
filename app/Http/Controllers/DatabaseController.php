@@ -129,16 +129,19 @@ class DatabaseController extends Controller
             Notify::error('You have to select at least one table', 'Error');
             return redirect()->back();
         }
-        $destination_path = 'generated_files/migration_tables.zip';
+        $destination_path = 'generated_files/' . $database->name .'.zip';
         if (file_exists($destination_path)) {
             unlink($destination_path);
         }
         $tables = Table::find($request->tables);
         foreach ($tables as $table) {
-            $table->add_to_export($destination_path);
+            if($request->export_type == 'migration') $table->save_migration_to_zip($destination_path);
+            if($request->export_type == 'api-crud') {
+                $table->save_api_crud_to_zip($destination_path);
+            }
         }
         if (file_exists($destination_path)) {
-            $zip_file_name = 'migrations';
+            $zip_file_name = $database->name . '_' . $request->export_type;
             return $database->getDownload($destination_path, $zip_file_name);
         }
         Notify::error('Download Error', 'Error');

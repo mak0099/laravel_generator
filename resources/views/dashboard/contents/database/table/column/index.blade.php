@@ -110,7 +110,7 @@
                             <div class="well">
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        {!! BootForm::select('foreign_table_id', 'Foreign Table', [], old('foreign_table_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Table','data-model'=>'Table', 'data-text-field'=>'name']) !!}
+                                        {!! BootForm::select('foreign_table_id', 'Foreign Table', [], old('foreign_table_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Table','data-model'=>'Table', 'data-text-field'=>'name', 'data-where-column'=>'database_id', 'data-where-value'=>$database->id]) !!}
                                     </div>
                                     <div class="col-sm-4">
                                         {!! BootForm::select('foreign_column_id', 'Foreign Column', [], old('foreign_column_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Column','data-model'=>'Column', 'data-text-field'=>'name', 'data-dependent-element-id'=>'foreign_table_id']) !!}

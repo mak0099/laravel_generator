@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Model\>>MODEL_NAME<<;
+use App\Http\Resources\>>MODEL_NAME<<Resource;
+use Illuminate\Http\Request;
+
+class >>MODEL_NAME<<Controller extends Controller
+{
+    public function index()
+    {
+        return >>MODEL_NAME<<Resource::collection(>>MODEL_NAME<<::orderBy('id','desc')->get());
+    }
+
+    public function store(Request $request)
+    {
+        $items = >>MODEL_NAME<<::create($request->all());
+        return new >>MODEL_NAME<<Resource($items);
+    }
+    public function show(>>MODEL_NAME<< $item)
+    {
+        return new >>MODEL_NAME<<Resource($item);
+    }
+    public function update(Request $request, >>MODEL_NAME<< $item)
+    {
+        $item->update($request->all());
+        return new >>MODEL_NAME<<Resource($item);
+    }
+
+    public function destroy(>>MODEL_NAME<< $item)
+    {
+        $item->delete();
+        return new >>MODEL_NAME<<Resource($item);
+    }
+}

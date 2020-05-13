@@ -44,13 +44,13 @@ class TableController extends Controller
     {
         if($request->user_tracking){
             $this->validate($request, [
-                'name' => 'required|max:100|unique:tables',
+                'name' => 'required|max:100',
                 'foreign_table_id' => 'required',
                 'foreign_column_id' => 'required',
                 ]);
         }else{
             $this->validate($request, [
-                'name' => 'required|max:100|unique:tables',
+                'name' => 'required|max:100',
               ]);
         }
         $table = new Table();
@@ -123,6 +123,23 @@ class TableController extends Controller
         $this->delete_file($table->image_path);
         Notify::success('Table deleted', 'Success');
         return redirect()->route('database.table.index', $database);
+    }
+    public function api_crud(Database $database, Table $table){
+        $view = view(config('dashboard.view_root'). 'database.table.api_crud');
+        $view->with('database', $database);
+        $view->with('table', $table);
+        return $view;
+    }
+    public function export_api_crud(Database $database, Table $table){
+        $destination_path = 'generated_files/api_crud.zip';
+        if (file_exists($destination_path)) {
+            unlink($destination_path);
+        }
+        $table->save_api_crud_to_zip();
+        if (file_exists($destination_path)) {
+            $zip_file_name = 'api_crud';
+            return $database->getDownload($destination_path, $zip_file_name);
+        }
     }
     private function delete_file($file_path){
         if(file_exists($file_path)){

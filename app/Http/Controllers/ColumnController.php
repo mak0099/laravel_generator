@@ -46,7 +46,7 @@ class ColumnController extends Controller
     {
         // dd($request->input());
         $this->validate($request, [
-            'name' => 'required|max:50|unique:columns',
+            'name' => 'required|max:50',
           ]);
         $column = new Column();
         $column->fill($request->input());
@@ -98,7 +98,7 @@ class ColumnController extends Controller
     public function update(Database $database, Table $table, Request $request, Column $column)
     {
         $this->validate($request, [
-            'name' => 'required|max:50||unique:columns,id,'.$column->id,
+            'name' => 'required|max:50',
           ]);
         $column->fill($request->input());
         $column->updator_user_id = Auth::id();
