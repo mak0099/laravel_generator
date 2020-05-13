@@ -38,7 +38,7 @@ class Column extends Model implements Sortable
     {
         return $this->belongsTo(Database::class);
     }
-    public function tbl()
+    public function table()
     {
         return $this->belongsTo(Table::class, 'table_id');
     }

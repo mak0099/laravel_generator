@@ -144,8 +144,8 @@ class Table extends Model implements Sortable
         $foreign_has_columns = $this->database->columns()->where('foreign_table_id', $this->id)->get();
         foreach($foreign_has_columns as $column){
             $fn .= "\tpublic function ";
-            $fn .= $column->tbl->get_table_name() . "()\n\t{\n";
-            $fn .= "\t\treturn \$this->hasMany(" . $column->tbl->get_model_name() . "::class);\n\t}\n";
+            $fn .= $column->table()->first()->get_table_name() . "()\n\t{\n";
+            $fn .= "\t\treturn \$this->hasMany(" . $column->table()->first()->get_model_name() . "::class);\n\t}\n";
             
         }
         return $fn;
