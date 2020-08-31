@@ -125,7 +125,7 @@
                     <div ng-show="type=='enum' || type=='set'">
                         <div class="panel">
                             <div class="well">
-                                {!! BootForm::text('length', ['html'=>'Enter Options <small>(separated with a comma)</small>'], old('length'), ['data-role'=>'tagsinput', 'placeholder'=>'e.g: option1, option2']) !!}
+                                {!! BootForm::text('length', ['html'=>'Enter Options <small>(separated with a comma)</small>'], old('length'), ['data-role'=>'tagsinput', 'placeholder'=>'option1, option2, option3']) !!}
                                 {!! BootForm::checkbox('nullable', 'Nullable', 1, true, ['ng-model'=>'nullable']) !!}
                                 {!! BootForm::text('default', 'Default Value', old('default'), ['ng-disabled'=>'nullable', 'placeholder'=>'Enter a option from above']) !!}
                             </div>

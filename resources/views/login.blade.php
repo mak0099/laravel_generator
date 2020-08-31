@@ -35,11 +35,11 @@
                 <form action="{{route('login')}}" method="post">
                     {{csrf_field()}}
                     <div class="form-group has-feedback">
-                        <input type="text" class="form-control" placeholder="Username" name="username" autofocus="" autocomplete="off">
+                        <input type="text" class="form-control" placeholder="Username" name="username" autofocus autocomplete="off">
                         <span class="glyphicon glyphicon-user form-control-feedback"></span>
                     </div>
                     <div class="form-group has-feedback">
-                        <input type="password" class="form-control" placeholder="Password" name="password" autofocus="">
+                        <input type="password" class="form-control" placeholder="Password" name="password">
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                     </div>
                     <div class="row">

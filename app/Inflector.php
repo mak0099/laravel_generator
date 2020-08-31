@@ -685,8 +685,9 @@ class Inflector extends Model
      * @return string
      * @link https://book.cakephp.org/3.0/en/core-libraries/inflector.html#creating-url-safe-strings
      */
-    public static function slug($string, $replacement = '-')
+    public function slug($replacement = '-')
     {
+        $string = $this->value;
         $quotedReplacement = preg_quote($replacement, '/');
         $map = [
             '/[^\s\p{Zs}\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]/mu' => ' ',
@@ -698,7 +699,8 @@ class Inflector extends Model
             array_values(static::$_transliteration),
             $string
         );
-        return preg_replace(array_keys($map), array_values($map), $string);
+	    $this->value = preg_replace(array_keys($map), array_values($map), $string);
+	    return $this;
     }
 
 	    public function camel_case($capitalize_first_char = false) {

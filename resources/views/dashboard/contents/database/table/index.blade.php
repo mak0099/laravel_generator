@@ -13,6 +13,7 @@
             </ol>
         </div>
         <div class="col-xs-8 text-right m-b-20">
+            <a href="#" class="btn btn-info rounded pull-right" data-toggle="modal" data-target="#import"><i class="fa fa-cloud-upload"></i> Import Table</a>
             <a href="#" class="btn btn-primary rounded pull-right" data-toggle="modal" data-target="#create"><i class="fa fa-plus"></i> Create Table</a>
             <div class="view-icons">
                 <a href="#" class="grid-view btn btn-link"><i class="fa fa-th"></i></a>
@@ -125,6 +126,60 @@
         </div>
     </div>
 </div>
+<div id="import" class="modal custom-modal fade" role="dialog">
+    <div class="modal-dialog">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h4 class="modal-title">Import Tables</h4>
+            </div>
+            <div class="modal-body">
+                <div class="card-box">
+                    <h6 class="card-title">Import from...</h6>
+                    <ul class="nav nav-tabs nav-tabs-bottom nav-justified">
+                        <li class="active"><a href="#bottom-justified-tab1" data-toggle="tab">Laravel Migration</a></li>
+                        <li><a href="#bottom-justified-tab2" data-toggle="tab">SQL</a></li>
+                        <li><a href="#bottom-justified-tab3" data-toggle="tab">Other</a></li>
+                    </ul>
+                    <div class="tab-content" style="min-height: 500px">
+                        <div class="tab-pane active" id="bottom-justified-tab1">
+                            <form action="{{ route('database.import', $database) }}" method="POST" autocomplete="off" enctype="multipart/form-data">
+                                @csrf
+                                @method('POST')
+                                <label style="
+                                    border: 3px dashed #ccc;
+                                    border-radius: 20px;
+                                    display: inline-block;
+                                    width: 80%;
+                                    margin: 5% 10%;
+                                    padding: 5%;
+                                    font-size: 2em;
+                                    text-align: center;
+                                    cursor: pointer;"
+                                >
+                                <input type="hidden" name="import_type" value="laravel-migration">
+                                    <input type="file" id="files" name="files[]" multiple onchange="javascript:updateList()" style="display: none"/>
+                                    <i class="fa fa-cloud-upload"></i> Choose Files
+                                </label>
+                                <ul class="list-group" id="fileList"></ul>
+                                <div class="m-t-20 text-center">
+                                    <button class="btn btn-primary btn-lg"><span class="fa fa-upload"></span>  Import</button>
+                                </div>
+                            </form>
+                            
+                        </div>
+                        <div class="tab-pane" id="bottom-justified-tab2">
+                            Under Construction
+                        </div>
+                        <div class="tab-pane" id="bottom-justified-tab3">
+                            Under Construction
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="delete" class="modal custom-modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content modal-md">
@@ -154,5 +209,17 @@
         @if(count($errors) > 0)
         $('#create').modal('show')
         @endif
+        updateList = function() {
+            var input = document.getElementById('files');
+            var output = document.getElementById('fileList');
+            var children = "";
+            for (var i = 0; i < input.files.length; ++i) {
+                children +=  '<li class="list-group-item"><span class="fa fa-table"></span> '+ input.files.item(i).name+ '<span style="margin-left:15px" class="fa fa-times text-danger pull-right" onclick="remove(this,'+ i +')"></span>' +'<span class="text-muted pull-right">'+ input.files.item(i).size/100 +'KB</span>' + '</li>'
+            }
+            output.innerHTML = children;
+        }
+        remove = function(event, index){
+            // return event.parentNode.remove();
+        }
     </script>
 @endsection

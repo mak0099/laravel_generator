@@ -27,6 +27,7 @@ Route::group(['prefix' => 'dashboard'], function () {
         Route::get('/crud-generator/crud-option/{crud_id}', ['as' => 'crud_option', 'uses' => 'CrudController@crudOption']);
         Route::post('/crud-generator/crud-generate/{crud_id}', ['as' => 'generate_crud', 'uses' => 'CrudController@generateCrud']);
         
+        Route::post('/database/{database}/import', ['as' => 'database.import', 'uses' => 'DatabaseController@import']);
         Route::get('/database/{database}/exportation', ['as' => 'database.exportation', 'uses' => 'DatabaseController@exportation']);
         Route::post('/database/{database}/export', ['as' => 'database.export', 'uses' => 'DatabaseController@export']);
         Route::get('/database/{database}/table/{table}/api-crud', ['as' => 'database.table.api_crud', 'uses' => 'TableController@api_crud']);

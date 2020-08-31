@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Column;
 use App\Models\Database;
 use App\Models\Table;
 use Helmesvs\Notify\Facades\Notify;
@@ -55,7 +56,7 @@ class TableController extends Controller
         }
         $table = new Table();
         $table->fill($request->input());
-        $table->creator_user_id = Auth::id();
+        $table->creator_user_id = auth()->id();
         $table->database()->associate($database);
         $table->save();
         $request->auto_increament ? $table->create_auto_increament() : null;
@@ -119,6 +120,11 @@ class TableController extends Controller
      */
     public function destroy(Database $database, Table $table)
     {
+        if(Column::where('foreign_table_id', $table->id)->first()){
+            Notify::error('This table is using as a foreign table', 'Error');
+            return redirect()->back();
+        }
+        $table->columns()->delete();
         $table->delete();
         $this->delete_file($table->image_path);
         Notify::success('Table deleted', 'Success');

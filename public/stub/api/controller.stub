@@ -2,35 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Model\>>MODEL_NAME<<;
+use App\Models\>>MODEL_NAME<<;
 use App\Http\Resources\>>MODEL_NAME<<Resource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class >>MODEL_NAME<<Controller extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return >>MODEL_NAME<<Resource::collection(>>MODEL_NAME<<::orderBy('id','desc')->get());
+        return >>MODEL_NAME<<Resource::collection(>>MODEL_NAME<<::where('company_id', $request->header('company_id'))->latest()->paginate($request->perPage));
     }
 
     public function store(Request $request)
-    {
-        $items = >>MODEL_NAME<<::create($request->all());
-        return new >>MODEL_NAME<<Resource($items);
+    {>>STORE_VALIDATIONS<<
+        $>>VARIABLE_NAME<< = new >>MODEL_NAME<<;
+        $>>VARIABLE_NAME<<->fill($request->all());
+        $>>VARIABLE_NAME<<->created_by = auth()->id();
+        $>>VARIABLE_NAME<<->company_id = $request->header('company_id');
+        $>>VARIABLE_NAME<<->save();
+        return new >>MODEL_NAME<<Resource($>>VARIABLE_NAME<<);
     }
-    public function show(>>MODEL_NAME<< $item)
+    public function show(>>MODEL_NAME<< $>>VARIABLE_NAME<<)
     {
-        return new >>MODEL_NAME<<Resource($item);
+        return new >>MODEL_NAME<<Resource($>>VARIABLE_NAME<<);
     }
-    public function update(Request $request, >>MODEL_NAME<< $item)
-    {
-        $item->update($request->all());
-        return new >>MODEL_NAME<<Resource($item);
+    public function update(Request $request, >>MODEL_NAME<< $>>VARIABLE_NAME<<)
+    {>>UPDATE_VALIDATIONS<<
+        $>>VARIABLE_NAME<<->fill($request->all());
+        $>>VARIABLE_NAME<<->updated_by = auth()->id();
+        $>>VARIABLE_NAME<<->company_id = $request->header('company_id');
+        $>>VARIABLE_NAME<<->update();
+        return new >>MODEL_NAME<<Resource($>>VARIABLE_NAME<<);
     }
 
-    public function destroy(>>MODEL_NAME<< $item)
+    public function destroy(>>MODEL_NAME<< $>>VARIABLE_NAME<<)
     {
-        $item->delete();
-        return new >>MODEL_NAME<<Resource($item);
+        $>>VARIABLE_NAME<<->delete();
+        return new >>MODEL_NAME<<Resource($>>VARIABLE_NAME<<);
     }
 }
