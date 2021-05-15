@@ -11,7 +11,11 @@ class >>MODEL_NAME<<Controller extends Controller
 {
     public function index(Request $request)
     {
-        return >>MODEL_NAME<<Resource::collection(>>MODEL_NAME<<::where('company_id', $request->header('company_id'))->latest()->paginate($request->perPage));
+        $data = >>MODEL_NAME<<::latest();
+        $request->perPage > 0 ?
+            $data = $data->paginate($request->perPage) :
+            $data = $data->get();
+        return >>MODEL_NAME<<Resource::collection($data);
     }
 
     public function store(Request $request)
@@ -19,7 +23,6 @@ class >>MODEL_NAME<<Controller extends Controller
         $>>VARIABLE_NAME<< = new >>MODEL_NAME<<;
         $>>VARIABLE_NAME<<->fill($request->all());
         $>>VARIABLE_NAME<<->created_by = auth()->id();
-        $>>VARIABLE_NAME<<->company_id = $request->header('company_id');
         $>>VARIABLE_NAME<<->save();
         return new >>MODEL_NAME<<Resource($>>VARIABLE_NAME<<);
     }
@@ -31,7 +34,6 @@ class >>MODEL_NAME<<Controller extends Controller
     {>>UPDATE_VALIDATIONS<<
         $>>VARIABLE_NAME<<->fill($request->all());
         $>>VARIABLE_NAME<<->updated_by = auth()->id();
-        $>>VARIABLE_NAME<<->company_id = $request->header('company_id');
         $>>VARIABLE_NAME<<->update();
         return new >>MODEL_NAME<<Resource($>>VARIABLE_NAME<<);
     }

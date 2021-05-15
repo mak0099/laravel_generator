@@ -19,7 +19,7 @@ class TableController extends Controller
      */
     public function index(Database $database)
     {
-        $view = view(config('dashboard.view_root'). 'database.table.index');
+        $view = view(config('dashboard.view_root') . 'database.table.index');
         $view->with('database', $database);
         $view->with('table_list', Table::where('database_id', $database->id)->ordered()->get());
         return $view;
@@ -43,26 +43,29 @@ class TableController extends Controller
      */
     public function store(Database $database, Request $request)
     {
-        if($request->user_tracking){
-            $this->validate($request, [
-                'name' => 'required|max:100',
-                'foreign_table_id' => 'required',
-                'foreign_column_id' => 'required',
-                ]);
-        }else{
-            $this->validate($request, [
-                'name' => 'required|max:100',
-              ]);
-        }
+        $this->validate($request, [
+            'name' => 'required|max:100',
+        ]);
+        // if($request->user_tracking){
+        //     $this->validate($request, [
+        //         'name' => 'required|max:100',
+        //         'foreign_table_id' => 'required',
+        //         'foreign_column_id' => 'required',
+        //         ]);
+        // }else{
+        //     $this->validate($request, [
+        //         'name' => 'required|max:100',
+        //       ]);
+        // }
         $table = new Table();
         $table->fill($request->input());
         $table->creator_user_id = auth()->id();
         $table->database()->associate($database);
         $table->save();
-        $request->auto_increament ? $table->create_auto_increament() : null;
-        $request->user_tracking ? $table->create_user_tracking($request->foreign_table_id, $request->foreign_column_id, $request->on_delete) : null;
-        $request->softdelete ? $table->create_softdelete() : null;
-        $request->timestamp ? $table->create_timestamp() : null;
+        // $request->auto_increament ? $table->create_auto_increament() : null;
+        // $request->user_tracking ? $table->create_user_tracking($request->foreign_table_id, $request->foreign_column_id, $request->on_delete) : null;
+        // $request->softdelete ? $table->create_softdelete() : null;
+        // $request->timestamp ? $table->create_timestamp() : null;
         Notify::success('New table saved', 'Success');
         return redirect()->back();
     }
@@ -75,7 +78,7 @@ class TableController extends Controller
      */
     public function show(Database $database, Table $table)
     {
-        $view = view(config('dashboard.view_root'). 'database.table.detail');
+        $view = view(config('dashboard.view_root') . 'database.table.detail');
         $view->with('table', $table);
         return $view;
     }
@@ -88,7 +91,7 @@ class TableController extends Controller
      */
     public function edit(Database $database, Table $table)
     {
-        $view = view(config('dashboard.view_root'). 'database.table.edit');
+        $view = view(config('dashboard.view_root') . 'database.table.edit');
         $view->with('table', $table);
         return $view;
     }
@@ -104,7 +107,7 @@ class TableController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|max:100',
-         ]);
+        ]);
         $table->fill($request->input());
         $table->updator_user_id = Auth::id();
         $table->update();
@@ -120,7 +123,7 @@ class TableController extends Controller
      */
     public function destroy(Database $database, Table $table)
     {
-        if(Column::where('foreign_table_id', $table->id)->first()){
+        if (Column::where('foreign_table_id', $table->id)->first()) {
             Notify::error('This table is using as a foreign table', 'Error');
             return redirect()->back();
         }
@@ -130,13 +133,15 @@ class TableController extends Controller
         Notify::success('Table deleted', 'Success');
         return redirect()->route('database.table.index', $database);
     }
-    public function api_crud(Database $database, Table $table){
-        $view = view(config('dashboard.view_root'). 'database.table.api_crud');
+    public function api_crud(Database $database, Table $table)
+    {
+        $view = view(config('dashboard.view_root') . 'database.table.api_crud');
         $view->with('database', $database);
         $view->with('table', $table);
         return $view;
     }
-    public function export_api_crud(Database $database, Table $table){
+    public function export_api_crud(Database $database, Table $table)
+    {
         $destination_path = 'generated_files/api_crud.zip';
         if (file_exists($destination_path)) {
             unlink($destination_path);
@@ -147,8 +152,9 @@ class TableController extends Controller
             return $database->getDownload($destination_path, $zip_file_name);
         }
     }
-    private function delete_file($file_path){
-        if(file_exists($file_path)){
+    private function delete_file($file_path)
+    {
+        if (file_exists($file_path)) {
             unlink($file_path);
         }
     }

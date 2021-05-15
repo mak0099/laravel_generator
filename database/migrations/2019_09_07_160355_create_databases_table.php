@@ -10,6 +10,8 @@ class CreateDatabasesTable extends Migration
         Schema::create('databases', function (Blueprint $table) {
             $table->increments('id');
 			$table->string('name');
+			$table->boolean('user_table')->default(true);
+			$table->boolean('user_permission')->default(false);
 			$table->boolean('active')->default(true);
 			$table->bigInteger('creator_user_id')->unsigned()->nullable();
 			$table->foreign('creator_user_id')->references('id')->on('users')->onDelete('cascade');

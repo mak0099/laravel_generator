@@ -34,6 +34,10 @@ class Column extends Model implements Sortable
         'status',
 
     ];
+    public function buildSortQuery()
+    {
+        return static::query()->where('table_id', $this->table_id);
+    }
     public function database()
     {
         return $this->belongsTo(Database::class);

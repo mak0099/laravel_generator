@@ -1,7 +1,7 @@
 @extends('dashboard.layouts.master')
 @section('style')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/dataTables.bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap-datetimepicker.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/dataTables.bootstrap.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap-datetimepicker.min.css') }}">
 @endsection
 @section('content')
 <div class="content container-fluid">
@@ -74,6 +74,10 @@
                     @csrf
                     @method('POST')
                     {!! BootForm::text('name', 'Database Name', old('name'), ['autofocus'=>'true']) !!}
+                    {!! BootForm::hidden('user_table', 0, false) !!}
+                    {!! BootForm::checkbox('user_table', 'USER Table', 1, old('user_table') ?? false, ['ng-model'=>'user_table']) !!}
+                    {!! BootForm::hidden('user_permission', 0, false) !!}
+                    {!! BootForm::checkbox('user_permission', 'USER Role/Permission (Spatie)', 1, old('user_permission') ?? false, ['ng-model'=>'user_permission', 'ng-disabled'=>'!user_table']) !!}
                     {!! BootForm::radios('active', 'Status', ['1'=>'Active', '0'=>'Inactive',], old('active') ?? 1, true) !!}
                     <div class="m-t-20 text-center">
                         <button class="btn btn-primary btn-lg">Create Database</button>
@@ -103,14 +107,14 @@
 </div>
 @endsection
 @section('script')
-    <script type="text/javascript" src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/dataTables.bootstrap.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/moment.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/bootstrap-datetimepicker.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/plugins/morris/morris.min.js') }}"></script>
-    <script>
-        @if(count($errors) > 0)
-        $('#create').modal('show')
-        @endif
-    </script>
+<script type="text/javascript" src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/dataTables.bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/moment.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/bootstrap-datetimepicker.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/plugins/morris/morris.min.js') }}"></script>
+<script>
+    @if(count($errors) > 0)
+    $('#create').modal('show')
+    @endif
+</script>
 @endsection

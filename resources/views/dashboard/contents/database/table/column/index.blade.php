@@ -1,8 +1,8 @@
 @extends('dashboard.layouts.master')
 @section('style')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/dataTables.bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap-datetimepicker.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap-tagsinput.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/dataTables.bootstrap.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap-datetimepicker.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap-tagsinput.css') }}">
 @endsection
 @section('content')
 <div class="content container-fluid">
@@ -35,26 +35,42 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @if($table->auto_increament)
+                        <tr>
+                            <td style="color:#ccc">0</td>
+                            <td><i class="fa fa-columns"></i> id</td>
+                            <td>
+                                <span style="color: #666">
+                                    bigIncreaments
+                                </span>
+                            </td>
+                            <td style="color: #666">NOT NULL</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        @endif
                         @foreach ($column_list as $item)
                         <tr>
                             <td style="color:#ccc">{{ $loop->iteration }}</td>
                             <td>
-                                <a href="{{ route('database.table.column.show', [$database, $table, $item]) }}"><i class="fa fa-columns"></i> {{ $item->name }}</a> 
+                                <a href="{{ route('database.table.column.show', [$database, $table, $item]) }}"><i class="fa fa-columns"></i> {{ $item->name }}</a>
                             </td>
                             <td>
-                                <span style="color: #666"> 
+                                <span style="color: #666">
                                     {{ $item->type }}
+                                    @if ($item->type=='foreign')
+                                        | {{$item->foreign_table->name}}:{{optional($item->foreign_column)->name ?? 'id'}}
+                                    @endif
                                 </span>
                             </td>
                             <td>
-                                <span style="color: #666"> 
-                                    {{ !$item->nullable? 'NOT NULL':null }}  
-                                </span> 
+                                <span style="color: #666">
+                                    {{ !$item->nullable? 'NOT NULL':'NULLABLE' }}
+                                </span>
                             </td>
                             <td>
-                               <span style="color: #666"> 
-                                    {{ $item->unique? 'UNIQUE':null }}  
-                                </span> 
+                                <span style="color: #666">
+                                    {{ $item->unique? 'UNIQUE':null }}
+                                </span>
                             </td>
                             <td>
                                 <div class="dropdown action-label">
@@ -79,6 +95,67 @@
                             </td>
                         </tr>
                         @endforeach
+                        @if($table->user_tracking)
+                        <tr>
+                            <td style="color:#ccc">0</td>
+                            <td><i class="fa fa-columns"></i> created_by</td>
+                            <td>
+                                <span style="color: #666">
+                                    bigIntegers | unsigned | foreign | users:id
+                                </span>
+                            </td>
+                            <td style="color: #666">NULLABLE</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        <tr>
+                            <td style="color:#ccc">0</td>
+                            <td><i class="fa fa-columns"></i> updated_by</td>
+                            <td>
+                                <span style="color: #666">
+                                    bigIntegers | unsigned | foreign | users:id
+                                </span>
+                            </td>
+                            <td style="color: #666">NULLABLE</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        @endif
+                        @if($table->softdelete)
+                        <tr>
+                            <td style="color:#ccc">0</td>
+                            <td><i class="fa fa-columns"></i> deleted_at</td>
+                            <td>
+                                <span style="color: #666">
+                                    timestamp 
+                                </span>
+                            </td>
+                            <td style="color: #666">NULLABLE</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        @endif
+                        @if($table->timestamp)
+                        <tr>
+                            <td style="color:#ccc">0</td>
+                            <td><i class="fa fa-columns"></i> created_at</td>
+                            <td>
+                                <span style="color: #666">
+                                    timestamp 
+                                </span>
+                            </td>
+                            <td style="color: #666">NULLABLE</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        <tr>
+                            <td style="color:#ccc">0</td>
+                            <td><i class="fa fa-columns"></i> updated_at</td>
+                            <td>
+                                <span style="color: #666">
+                                    timestamp 
+                                </span>
+                            </td>
+                            <td style="color: #666">NULLABLE</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -99,7 +176,7 @@
                     <span ng-init="type='{{ old('type') ?? App\Models\Column::get_laravel_default_type() }}'"></span>
                     <div class="row">
                         <div class="col-sm-6">
-                                {!! BootForm::text('name', 'Column Name', old('name'), ['autofocus'=>true]) !!}
+                            {!! BootForm::text('name', 'Column Name', old('name'), ['autofocus'=>true]) !!}
                         </div>
                         <div class="col-sm-6">
                             {!! BootForm::select('type', 'Column Type', [''=>''] +App\Models\Column::get_laravel_types(), old('type') ?? App\Models\Column::get_laravel_default_type(), ['class'=>'select2', 'data-placeholder'=>'Select Column Type', 'ng-model'=>'type']) !!}
@@ -109,11 +186,15 @@
                         <div class="panel">
                             <div class="well">
                                 <div class="row">
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         {!! BootForm::select('foreign_table_id', 'Foreign Table', [], old('foreign_table_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Table','data-model'=>'Table', 'data-text-field'=>'name', 'data-where-column'=>'database_id', 'data-where-value'=>$database->id]) !!}
                                     </div>
-                                    <div class="col-sm-4">
-                                        {!! BootForm::select('foreign_column_id', 'Foreign Column', [], old('foreign_column_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Column','data-model'=>'Column', 'data-text-field'=>'name', 'data-dependent-element-id'=>'foreign_table_id']) !!}
+                                    <div class="col-sm-2">
+                                        <span ng-init="select_id='1'"></span>
+                                        {!! BootForm::radios('select_id', 'Foreign Column', ['1'=>'id', '0'=>'others'], '1', true, ['ng-model'=>'select_id']) !!}
+                                    </div>
+                                    <div class="col-sm-3">
+                                        {!! BootForm::select('foreign_column_id', 'Choose other column', [], old('foreign_column_id'), ['class'=>'select2', 'data-placeholder'=>'Select Foreign Column','data-model'=>'Column', 'data-text-field'=>'name', 'data-dependent-element-id'=>'foreign_table_id', "ng-disabled"=>"select_id=='1'"]) !!}
                                     </div>
                                     <div class="col-sm-4">
                                         {!! BootForm::radios('on_delete', 'On Delete', App\Models\Column::get_on_deletes(), App\Models\Column::get_default_on_delete(), false) !!}
@@ -133,16 +214,16 @@
                     </div>
                     <div class="row" ng-if="type!='foreign' && type!='enum' && type!='set'">
                         <div class="col-sm-2">
-                                {!! BootForm::hidden('nullable', 0, false) !!}
-                                {!! BootForm::checkbox('nullable', 'Nullable', 1, true, ['ng-model'=>'nullable']) !!}
+                            {!! BootForm::hidden('nullable', 0, false) !!}
+                            {!! BootForm::checkbox('nullable', 'Nullable', 1, true, ['ng-model'=>'nullable']) !!}
                         </div>
                         <div class="col-sm-2">
-                                {!! BootForm::hidden('unique', 0, false) !!}
-                                {!! BootForm::checkbox('unique', 'Unique', 1, false) !!}
+                            {!! BootForm::hidden('unique', 0, false) !!}
+                            {!! BootForm::checkbox('unique', 'Unique', 1, false) !!}
                         </div>
                         <div class="col-sm-2" ng-show="type!='enum' && type!='set'">
-                                {!! BootForm::hidden('unsigned', 0, false) !!}
-                                {!! BootForm::checkbox('unsigned', 'Unsigned', 1, false) !!}
+                            {!! BootForm::hidden('unsigned', 0, false) !!}
+                            {!! BootForm::checkbox('unsigned', 'Unsigned', 1, false) !!}
                         </div>
                     </div>
                     <div ng-show="type!='foreign' && type!='enum' && type!='set'">
@@ -155,7 +236,7 @@
                             {!! BootForm::text('length', 'Length/Value', old('name'), []) !!}
                             {!! BootForm::text('default', 'Default Value', old('default'), []) !!}
                             {!! BootForm::radios('attribute', 'Attribute', [''=> 'NULL'] + App\Models\Column::get_attributes(), '', true) !!}
-                        {{-- {!! BootForm::radios('nullable', 'Nullable', ['1'=>'Yes', '0'=>'No',], 1, true) !!} --}}
+                            {{-- {!! BootForm::radios('nullable', 'Nullable', ['1'=>'Yes', '0'=>'No',], 1, true) !!} --}}
                             {{-- {!! BootForm::radios('unique', 'Unique', ['1'=>'Yes', '0'=>'No',], 0, true) !!} --}}
                             {{-- {!! BootForm::radios('primary', 'Primary', ['1'=>'Yes', '0'=>'No',], 0, true) !!} --}}
                             {{-- {!! BootForm::radios('index', 'Index', ['1'=>'Yes', '0'=>'No',], 0, true) !!} --}}
@@ -193,15 +274,15 @@
 </div>
 @endsection
 @section('script')
-    <script type="text/javascript" src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/dataTables.bootstrap.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/moment.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/bootstrap-datetimepicker.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/plugins/morris/morris.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/bootstrap-tagsinput.js') }}"></script>
-    <script>
-        @if(count($errors) > 0)
-        $('#create').modal('show')
-        @endif
-    </script>
+<script type="text/javascript" src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/dataTables.bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/moment.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/bootstrap-datetimepicker.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/plugins/morris/morris.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/bootstrap-tagsinput.js') }}"></script>
+<script>
+    @if(count($errors) > 0)
+    $('#create').modal('show')
+    @endif
+</script>
 @endsection

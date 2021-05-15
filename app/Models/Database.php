@@ -12,6 +12,9 @@ class Database extends Model
 
     protected $fillable = [
         'name',
+        'user_table',
+        'user_permission',
+        'active',
 
     ];
     public function tables()

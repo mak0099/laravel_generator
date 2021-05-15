@@ -17,8 +17,17 @@ class Table extends Model implements Sortable
 
     protected $fillable = [
         'name',
+        'pivot',
+        'auto_increament',
+        'user_tracking',
+        'softdelete',
+        'timestamp',
 
     ];
+    public function buildSortQuery()
+    {
+        return static::query()->where('database_id', $this->table_id);
+    }
     public function database()
     {
         return $this->belongsTo(Database::class);
@@ -151,9 +160,19 @@ class Table extends Model implements Sortable
         }
         $foreign_has_columns = $this->database->columns()->where('foreign_table_id', $this->id)->get();
         foreach ($foreign_has_columns as $column) {
-            $fn .= "\tpublic function ";
-            $fn .= $column->table()->first()->get_table_name() . "()\n\t{\n";
-            $fn .= "\t\treturn \$this->hasMany(" . $column->table()->first()->get_model_name() . "::class);\n\t}\n";
+            if ($column->table()->first()->pivot) {
+                $pivot_foreign_columns = $column->table()->first()->columns()->where('type', 'foreign')->get();
+                foreach ($pivot_foreign_columns as $pivot_foreign_column) {
+                    if ($pivot_foreign_column->foreign_table->id == $this->id) continue;
+                    $fn .= "\tpublic function ";
+                    $fn .= $pivot_foreign_column->foreign_table->get_table_name() . "()\n\t{\n";
+                    $fn .= "\t\treturn \$this->belongsToMany(" . $pivot_foreign_column->foreign_table->get_model_name() . "::class, '" . $pivot_foreign_column->table()->first()->get_table_name() . "', '" . $column->name . "', '" . $pivot_foreign_column->name . "');\n\t}\n";
+                }
+            } else {
+                $fn .= "\tpublic function ";
+                $fn .= $column->table()->first()->get_table_name() . "()\n\t{\n";
+                $fn .= "\t\treturn \$this->hasMany(" . $column->table()->first()->get_model_name() . "::class);\n\t}\n";
+            }
         }
         return $fn;
     }
@@ -268,17 +287,23 @@ class Table extends Model implements Sortable
     private function get_migration_columns()
     {
         $migration_columns = "";
+        if ($this->auto_increament) {
+            $migration_columns .= "\t\t\t\$table->bigIncrements('id');\n";
+        }
         foreach ($this->columns as $column) {
             if ($column->type == 'foreign') {
-                if ($column->foreign_column->type == 'bigIncrements' || $column->foreign_column->type == 'bigInteger') {
+                if (!$column->foreign_column) {
+                    $column_type = 'bigInteger';
+                } else if ($column->foreign_column->type == 'bigIncrements' || $column->foreign_column->type == 'bigInteger') {
                     $column_type = 'bigInteger';
                 } else {
                     $column_type = 'integer';
                 }
+                $foreign_column_name = optional($column->foreign_column)->name ?? 'id';
                 $migration_columns .= "\t\t\t\$table->" . $column_type . "('" . $column->name . "')->unsigned()";
                 $column->nullable ? $migration_columns .= '->nullable()' : null;
                 $migration_columns .= ";\n";
-                $migration_columns .= "\t\t\t\$table->foreign('" . $column->name . "')->references('" . $column->foreign_column->name . "')->on('" . $column->foreign_table->name . "')->onDelete('" . $column->on_delete . "');\n";
+                $migration_columns .= "\t\t\t\$table->foreign('" . $column->name . "')->references('" . $foreign_column_name . "')->on('" . $column->foreign_table->name . "')->onDelete('" . $column->on_delete . "');\n";
             } else if ($column->type == 'enum' || $column->type == 'set') {
                 $migration_columns .= "\t\t\t\$table->" . $column->type . "('" . $column->name . "', [";
                 $set_items = explode(',', $column->length);
@@ -297,6 +322,12 @@ class Table extends Model implements Sortable
                 $column->nullable ? $migration_columns .= '->nullable()' : null;
                 $migration_columns .= ";\n";
             }
+        }
+        if ($this->softdelete) {
+            $migration_columns .= "\t\t\t\$table->softDeletes();\n";
+        }
+        if ($this->timestamp) {
+            $migration_columns .= "\t\t\t\$table->timestamps();\n";
         }
         return $migration_columns;
     }
@@ -358,9 +389,11 @@ class Table extends Model implements Sortable
     }
     public function save_api_crud_to_zip($destination_path)
     {
-        $this->save_model_to_zip($destination_path);
-        $this->save_api_controller_to_zip($destination_path);
-        $this->save_api_resource_to_zip($destination_path);
+        if (!$this->pivot) {
+            $this->save_model_to_zip($destination_path);
+            $this->save_api_controller_to_zip($destination_path);
+            $this->save_api_resource_to_zip($destination_path);
+        }
         $this->save_migration_to_zip($destination_path);
     }
 }

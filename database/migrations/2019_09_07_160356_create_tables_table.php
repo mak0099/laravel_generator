@@ -10,6 +10,7 @@ class CreateTablesTable extends Migration
         Schema::create('tables', function (Blueprint $table) {
             $table->increments('id');
 			$table->string('name');
+			$table->boolean('pivot')->default(false);
 			$table->boolean('auto_increament')->default(true);
 			$table->boolean('user_tracking')->default(false);
 			$table->boolean('softdelete')->default(false);
